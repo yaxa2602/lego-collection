@@ -16,18 +16,25 @@ export default function SetActions({ setNum, initialStatus, isAuthed }:
 
   async function setTo(next: Status) {
     if (!isAuthed) { router.push("/login"); return; }
-    setBusy(true); setError(null);
-    const { data: { user } } = await supabase.auth.getUser();
-    if (!user) { router.push("/login"); return; }
-    const res = next === null
-      ? await supabase.from("collection_items").delete().eq("user_id", user.id).eq("set_num", setNum)
-      : await supabase.from("collection_items").upsert(
-          { user_id: user.id, set_num: setNum, status: next },
-          { onConflict: "user_id,set_num" }
-        );
-    setBusy(false);
-    if (res.error) setError("Не получилось сохранить, попробуйте ещё раз.");
-    else setStatus(next);
+
+    try {
+      setBusy(true);
+      setError(null);
+      const { data: { user } } = await supabase.auth.getUser();
+      if (!user) { router.push("/login"); return; }
+      const res = next === null
+        ? await supabase.from("collection_items").delete().eq("user_id", user.id).eq("set_num", setNum)
+        : await supabase.from("collection_items").upsert(
+            { user_id: user.id, set_num: setNum, status: next },
+            { onConflict: "user_id,set_num" }
+          );
+      if (res.error) setError("Не получилось сохранить, попробуйте ещё раз.");
+      else setStatus(next);
+    } catch {
+      setError("Не получилось сохранить, попробуйте ещё раз.");
+    } finally {
+      setBusy(false);
+    }
   }
 
   return (
