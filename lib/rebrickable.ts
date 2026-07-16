@@ -49,19 +49,41 @@ async function rb<T>(path: string, params?: URLSearchParams): Promise<T> {
 }
 
 // upsert наборов в кэш; ошибки кэша не роняют выдачу (console.error)
-async function cacheSets(sets: CachedSet[]): Promise<void> {
+// omitMinifigs: true — вызов из searchSets, где num_minifigs неизвестен;
+// колонка не попадает в payload, PostgREST её не трогает при конфликте (новые строки получат null).
+async function cacheSets(sets: CachedSet[], opts: { omitMinifigs?: boolean } = {}): Promise<void> {
   const { createAdminSupabase } = await import("@/lib/supabase/admin");
   const admin = createAdminSupabase();
-  const { error } = await admin.from("sets_cache").upsert(
-    sets.map((s) => ({ ...s, fetched_at: new Date().toISOString() }))
-  );
+  const rows = sets.map((s) => {
+    const { num_minifigs, ...rest } = s;
+    const row: Record<string, unknown> = { ...rest, fetched_at: new Date().toISOString() };
+    if (!opts.omitMinifigs) row.num_minifigs = num_minifigs;
+    return row;
+  });
+  const { error } = await admin.from("sets_cache").upsert(rows);
   if (error) console.error("cacheSets", error);
+}
+
+// сумма quantity по всем страницам /sets/{set_num}/minifigs/ (с ограничением на число страниц)
+async function countMinifigs(setNum: string): Promise<number> {
+  let total = 0;
+  let params: URLSearchParams | undefined;
+  let path = `/sets/${setNum}/minifigs/`;
+  let pages = 0;
+  while (pages < 20) {
+    pages++;
+    const page = await rb<RbPage<{ quantity: number }>>(path, params);
+    total += page.results.reduce((n, m) => n + m.quantity, 0);
+    if (!page.next) break;
+    const u = new URL(page.next); path = u.pathname.replace("/api/v3/lego", ""); params = u.searchParams;
+  }
+  return total;
 }
 
 export async function searchSets(opts: Parameters<typeof buildSetsQuery>[0]) {
   const page = await rb<RbPage<RbSet>>("/sets/", buildSetsQuery(opts));
   const sets = page.results.map((r) => mapSet(r));
-  cacheSets(sets).catch((e) => console.error("cacheSets", e));
+  cacheSets(sets, { omitMinifigs: true }).catch((e) => console.error("cacheSets", e));
   return { count: page.count, sets };
 }
 
@@ -70,16 +92,17 @@ export async function getSetCached(setNum: string): Promise<CachedSet | null> {
   const admin = createAdminSupabase();
   const { data } = await admin.from("sets_cache").select("*").eq("set_num", setNum).maybeSingle();
   if (data && Date.now() - new Date(data.fetched_at).getTime() < TTL_MS && data.num_minifigs !== null) {
-    return data as CachedSet;
+    return { ...(data as CachedSet), num_minifigs: data.num_minifigs ?? 0 };
   }
   try {
     const raw = await rb<RbSet>(`/sets/${setNum}/`);
-    const minifigs = await rb<RbPage<{ quantity: number }>>(`/sets/${setNum}/minifigs/`);
-    const set = mapSet(raw, minifigs.results.reduce((n, m) => n + m.quantity, 0));
-    await cacheSets([set]);
+    const numMinifigs = await countMinifigs(setNum);
+    const set = mapSet(raw, numMinifigs);
+    // кэш пишем в фоне: сбой кэширования не должен обесценивать успешно полученный набор
+    cacheSets([set]).catch((e) => console.error("cacheSets", e));
     return set;
   } catch (e) {
-    if (data) return data as CachedSet; // API лёг — отдаём протухший кэш
+    if (data) return { ...(data as CachedSet), num_minifigs: data.num_minifigs ?? 0 }; // API лёг — отдаём протухший кэш
     if (String(e).includes("404")) return null;
     throw e;
   }
@@ -93,21 +116,28 @@ export async function getThemesCached(): Promise<RbTheme[]> {
       Date.now() - new Date(data[0].fetched_at).getTime() < TTL_MS) {
     return data as RbTheme[];
   }
-  // дерево целиком (страницы по 1000, ~500 тем — 1 страница, но next обходим)
-  const all: RbTheme[] = [];
-  let params: URLSearchParams | undefined = new URLSearchParams({ page_size: "1000" });
-  let path = "/themes/";
-  while (true) {
-    const page: RbPage<RbTheme> = await rb<RbPage<RbTheme>>(path, params);
-    all.push(...page.results.map(t => ({ id: t.id, parent_id: t.parent_id, name: t.name })));
-    if (!page.next) break;
-    const u = new URL(page.next); path = u.pathname.replace("/api/v3/lego", ""); params = u.searchParams;
+  try {
+    // дерево целиком (страницы по 1000, ~500 тем — 1 страница, но next обходим)
+    const all: RbTheme[] = [];
+    let params: URLSearchParams | undefined = new URLSearchParams({ page_size: "1000" });
+    let path = "/themes/";
+    let pages = 0;
+    while (pages < 20) {
+      pages++;
+      const page: RbPage<RbTheme> = await rb<RbPage<RbTheme>>(path, params);
+      all.push(...page.results.map(t => ({ id: t.id, parent_id: t.parent_id, name: t.name })));
+      if (!page.next) break;
+      const u = new URL(page.next); path = u.pathname.replace("/api/v3/lego", ""); params = u.searchParams;
+    }
+    if (all.length) {
+      await admin.from("themes_cache").upsert(
+        all.map(t => ({ ...t, fetched_at: new Date().toISOString() }))
+      );
+      return all;
+    }
+    return (data as RbTheme[]) ?? [];
+  } catch (e) {
+    console.error("getThemesCached", e);
+    return (data as RbTheme[]) ?? [];
   }
-  if (all.length) {
-    await admin.from("themes_cache").upsert(
-      all.map(t => ({ ...t, fetched_at: new Date().toISOString() }))
-    );
-    return all;
-  }
-  return (data as RbTheme[]) ?? [];
 }
