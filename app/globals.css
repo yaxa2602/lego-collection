@@ -114,3 +114,18 @@ main.container { padding-top: 24px; padding-bottom: 48px; }
 .set-facts dd { margin: 0; font-weight: 600; }
 .set-actions { display: flex; gap: 10px; align-items: center; margin: 16px 0 24px; flex-wrap: wrap; }
 .ext-links { padding-left: 18px; }
+
+/* моя коллекция: вкладки, статистика, список */
+.tabs { display: flex; gap: 8px; margin: 12px 0 8px; }
+.stats { display: grid; gap: 16px; grid-template-columns: repeat(auto-fit, minmax(260px, 1fr)); margin: 20px 0; }
+.stats-card { padding: 14px 16px; }
+.totals { display: flex; justify-content: space-around; text-align: center; }
+.totals b { display: block; font-size: 24px; }
+.bar-row { display: grid; grid-template-columns: 1fr 2fr auto; gap: 8px; align-items: center; margin: 6px 0; font-size: 14px; }
+.bar-track { background: var(--border); border-radius: 6px; height: 10px; overflow: hidden; }
+.bar-fill { display: block; height: 100%; background: var(--accent); border-radius: 6px; }
+.bar-count { font-weight: 600; }
+.mine-list { list-style: none; padding: 0; display: grid; gap: 10px; }
+.mine-item { display: grid; grid-template-columns: 96px 1fr auto; gap: 14px; align-items: center; padding: 10px 14px; }
+.mine-item img { width: 96px; aspect-ratio: 4/3; object-fit: contain; background: #fff; border-radius: 8px; }
+@media (max-width: 600px) { .mine-item { grid-template-columns: 72px 1fr; } .mine-item .set-actions { grid-column: 1 / -1; margin: 0; } }
