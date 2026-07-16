@@ -20,10 +20,21 @@ export default async function PublicCollection({ params }: { params: Promise<{ s
     );
   }
 
-  const setNums = rows.map((r: { set_num: string }) => r.set_num);
+  const ownedRows = rows.filter((r: { status: string }) => r.status === "owned");
+
+  if (ownedRows.length === 0) {
+    return (
+      <main className="container">
+        <h1>Коллекция недоступна</h1>
+        <p className="muted">Ссылка неверна, шаринг выключен — или коллекция пока пуста.</p>
+      </main>
+    );
+  }
+
+  const setNums = ownedRows.map((r: { set_num: string }) => r.set_num);
   const { data: sets } = await supabase.from("sets_cache").select("*").in("set_num", setNums);
   const bySetNum = new Map((sets ?? []).map((s) => [s.set_num, s as CachedSet]));
-  const entries: Entry[] = rows
+  const entries: Entry[] = ownedRows
     .filter((r: { set_num: string }) => bySetNum.has(r.set_num))
     .map((r: { set_num: string; status: string }) => ({
       set: bySetNum.get(r.set_num)!,
