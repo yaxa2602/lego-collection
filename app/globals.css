@@ -1,0 +1,84 @@
+:root {
+  --bg: #faf8f5;
+  --panel: #ffffff;
+  --text: #1d1d1f;
+  --muted: #6e6e73;
+  --accent: #d01012;
+  --yellow: #ffcf00;
+  --blue: #0055bf;
+  --border: #e6e2dc;
+  --radius: 12px;
+}
+@media (prefers-color-scheme: dark) {
+  :root {
+    --bg: #1c1b19;
+    --panel: #262522;
+    --text: #f2f0ed;
+    --muted: #9c9a95;
+    --border: #3a3833;
+  }
+}
+* { box-sizing: border-box; }
+body {
+  margin: 0;
+  background: var(--bg);
+  color: var(--text);
+  font-family: var(--font-rubik), system-ui, sans-serif;
+  line-height: 1.5;
+}
+a { color: var(--blue); text-decoration: none; }
+a:hover { text-decoration: underline; }
+
+.container { max-width: 1080px; margin: 0 auto; padding: 0 16px; }
+
+/* шапка со студами */
+.site-header {
+  background: var(--panel);
+  border-bottom: 4px solid var(--accent);
+  padding: 12px 0;
+}
+.site-header .container { display: flex; align-items: center; gap: 20px; }
+.logo { font-weight: 700; font-size: 20px; color: var(--text); }
+.logo:hover { text-decoration: none; }
+.studs {
+  display: inline-flex; gap: 6px; margin-right: 4px; vertical-align: middle;
+}
+.studs i {
+  width: 12px; height: 12px; border-radius: 50%;
+  background: var(--accent);
+  box-shadow: inset 0 -2px 0 rgb(0 0 0 / 0.25);
+}
+.studs i:nth-child(2) { background: var(--yellow); }
+.studs i:nth-child(3) { background: var(--blue); }
+.nav { margin-left: auto; display: flex; gap: 16px; align-items: center; }
+
+/* карточки и кнопки */
+.card {
+  background: var(--panel);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  overflow: hidden;
+}
+.btn {
+  font: inherit; font-weight: 600; cursor: pointer;
+  padding: 8px 18px; border-radius: 10px;
+  border: 1px solid var(--border);
+  background: var(--panel); color: var(--text);
+}
+.btn-primary { background: var(--accent); border-color: var(--accent); color: #fff; }
+.btn:disabled { opacity: 0.5; cursor: default; }
+.badge {
+  display: inline-block; font-size: 12px; font-weight: 700;
+  padding: 2px 10px; border-radius: 999px; color: #fff;
+}
+.badge-owned { background: var(--accent); }
+.badge-wishlist { background: var(--blue); }
+
+.grid {
+  display: grid; gap: 16px;
+  grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+  padding: 0; list-style: none;
+}
+.muted { color: var(--muted); }
+.error { color: var(--accent); font-weight: 600; }
+main.container { padding-top: 24px; padding-bottom: 48px; }
