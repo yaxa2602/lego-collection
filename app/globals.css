@@ -116,6 +116,7 @@ main.container { padding-top: 24px; padding-bottom: 48px; }
 .ext-links { padding-left: 18px; }
 
 /* моя коллекция: вкладки, статистика, список */
+.page-head { display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 8px; }
 .tabs { display: flex; gap: 8px; margin: 12px 0 8px; }
 .stats { display: grid; gap: 16px; grid-template-columns: repeat(auto-fit, minmax(260px, 1fr)); margin: 20px 0; }
 .stats-card { padding: 14px 16px; }

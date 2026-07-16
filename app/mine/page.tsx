@@ -2,6 +2,7 @@ import Link from "next/link";
 import { redirect } from "next/navigation";
 import CollectionList from "@/components/CollectionList";
 import StatsPanel from "@/components/StatsPanel";
+import ShareButton from "@/components/ShareButton";
 import { createServerSupabase } from "@/lib/supabase/server";
 import { getThemesCached, type CachedSet } from "@/lib/rebrickable";
 import type { Entry } from "@/lib/stats";
@@ -32,7 +33,10 @@ export default async function Mine({ searchParams }: { searchParams: Promise<{ t
 
   return (
     <main className="container">
-      <h1>Моя коллекция</h1>
+      <div className="page-head">
+        <h1>Моя коллекция</h1>
+        <ShareButton />
+      </div>
       <nav className="tabs">
         <Link className={active === "owned" ? "btn btn-primary" : "btn"} href="/mine">Есть</Link>
         <Link className={active === "wishlist" ? "btn btn-primary" : "btn"} href="/mine?tab=wishlist">Вишлист</Link>
