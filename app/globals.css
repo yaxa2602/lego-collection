@@ -95,3 +95,12 @@ a:hover { text-decoration: underline; }
 .muted { color: var(--muted); }
 .error { color: var(--accent); font-weight: 600; }
 main.container { padding-top: 24px; padding-bottom: 48px; }
+
+/* каталог: фильтры, карточки наборов, пагинация */
+.filters { display: flex; flex-wrap: wrap; gap: 8px; margin-bottom: 20px; }
+.pager { display: flex; gap: 12px; align-items: center; justify-content: center; margin-top: 24px; }
+.set-card a { display: block; color: var(--text); text-decoration: none; }
+.set-card img { width: 100%; aspect-ratio: 4/3; object-fit: contain; background: #fff; }
+.set-card-body { padding: 10px 12px; }
+.set-card-name { font-weight: 600; }
+.set-noimg { aspect-ratio: 4/3; display: grid; place-items: center; font-size: 48px; }
