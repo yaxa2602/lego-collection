@@ -12,6 +12,7 @@ const rubik = Rubik({
 export const metadata: Metadata = {
   title: "Коллекция LEGO",
   description: "Каталог наборов LEGO и ваша личная коллекция",
+  manifest: "/manifest.webmanifest",
 };
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {

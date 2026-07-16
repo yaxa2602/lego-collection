@@ -1,36 +1,49 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# Коллекция LEGO
 
-## Getting Started
+Веб-приложение для просмотра каталога наборов LEGO и ведения личной коллекции: отмечайте наборы «есть» или «хочу», смотрите статистику по франшизам и годам, делитесь коллекцией по публичной ссылке.
 
-First, run the development server:
+## Возможности
+
+- **Каталог** (`/`) — поиск по названию/номеру набора, фильтр по франшизе, сортировка.
+- **Страница набора** (`/set/[номер]`) — фото, факты о наборе, ссылки на инструкции по сборке (lego.com), BrickLink и Avito.
+- **Моя коллекция** (`/mine`) — вкладки «есть» / «хочу», статистика по коллекции, требует входа.
+- **Публичная ссылка** (`/c/[slug]`) — коллекция, доступная по ссылке без входа (включается владельцем).
+- **Вход/регистрация** (`/login`) — через Supabase Auth.
+
+## Стек
+
+- [Next.js 16](https://nextjs.org) (App Router, TypeScript)
+- [Supabase](https://supabase.com) — база данных, аутентификация
+- [Rebrickable API](https://rebrickable.com/api/) — данные о наборах LEGO
+- Обычный CSS (без UI-фреймворков)
+- Деплой — [Vercel](https://vercel.com)
+
+## Запуск локально
 
 ```bash
+npm i
+cp .env.example .env.local   # и заполнить переменные
 npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+Приложение поднимется на [http://localhost:3000](http://localhost:3000).
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+Переменные окружения (`.env.local`):
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+- `NEXT_PUBLIC_SUPABASE_URL`, `NEXT_PUBLIC_SUPABASE_ANON_KEY` — публичные ключи Supabase-проекта.
+- `SUPABASE_SERVICE_ROLE_KEY` — сервисный ключ (только для серверных операций).
+- `REBRICKABLE_API_KEY` — ключ Rebrickable API.
 
-## Learn More
+## Источники данных и ограничения
 
-To learn more about Next.js, take a look at the following resources:
+- Данные о наборах и франшизах (темах) берутся из [Rebrickable API](https://rebrickable.com/api/) с кэшированием на стороне сервера.
+- Цен в приложении нет: Rebrickable их не отдаёт, поэтому со страницы набора можно перейти на BrickLink (актуальные цены и наличие) или на Avito (поиск объявлений).
+- Фильтр по франшизе в каталоге не показывает вложенные под-темы одним запросом — Rebrickable API принимает только одно значение `theme_id` за раз, без иерархического разворачивания.
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+## Тесты и проверки
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
-
-## Deploy on Vercel
-
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
-
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+```bash
+npm test          # unit-тесты (Vitest)
+npx tsc --noEmit   # проверка типов
+npm run build      # production-сборка
+```
