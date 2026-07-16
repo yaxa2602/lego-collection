@@ -11,11 +11,11 @@ function errorMessage(message: string): string {
   if (message.includes("User already registered")) return "Пользователь с таким email уже зарегистрирован.";
   if (message.includes("Password should be at least")) return "Пароль слишком короткий (минимум 6 символов).";
   if (message.includes("valid email")) return "Введите корректный email.";
-  return `Ошибка: ${message}`;
+  return "Что-то пошло не так. Попробуйте ещё раз.";
 }
 
 export default function LoginPage() {
-  const supabase = createBrowserSupabase();
+  const [supabase] = useState(() => createBrowserSupabase());
   const router = useRouter();
   const [mode, setMode] = useState<"signin" | "signup">("signin");
   const [email, setEmail] = useState("");
