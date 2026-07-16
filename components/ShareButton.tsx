@@ -37,6 +37,8 @@ export default function ShareButton() {
       } else {
         setSlug(newSlug);
       }
+    } catch {
+      setError("Не получилось, попробуйте ещё раз.");
     } finally {
       setBusy(false);
     }
@@ -57,6 +59,8 @@ export default function ShareButton() {
       } else {
         setSlug(null);
       }
+    } catch {
+      setError("Не получилось, попробуйте ещё раз.");
     } finally {
       setBusy(false);
     }

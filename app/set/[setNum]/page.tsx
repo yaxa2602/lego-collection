@@ -7,8 +7,17 @@ import { createServerSupabase } from "@/lib/supabase/server";
 
 export const dynamic = "force-dynamic";
 
+const SET_NUM_PATTERN = /^[A-Za-z0-9.]+(-\d+)?$/;
+
+export async function generateMetadata({ params }: { params: Promise<{ setNum: string }> }) {
+  const { setNum } = await params;
+  const set = await getSetCached(setNum).catch(() => null);
+  return { title: set ? `${set.name} — Коллекция LEGO` : "Коллекция LEGO" };
+}
+
 export default async function SetPage({ params }: { params: Promise<{ setNum: string }> }) {
   const { setNum } = await params;
+  if (!SET_NUM_PATTERN.test(setNum)) notFound();
   const set = await getSetCached(setNum);
   if (!set) notFound();
 

@@ -6,29 +6,28 @@ import type { Entry } from "@/lib/stats";
 
 export const dynamic = "force-dynamic";
 
+function Unavailable() {
+  return (
+    <main className="container">
+      <h1>Коллекция недоступна</h1>
+      <p className="muted">Ссылка неверна, шаринг выключен — или коллекция пока пуста.</p>
+    </main>
+  );
+}
+
 export default async function PublicCollection({ params }: { params: Promise<{ slug: string }> }) {
   const { slug } = await params;
   const supabase = await createServerSupabase();
   const { data: rows } = await supabase.rpc("collection_by_slug", { p_slug: slug });
 
   if (!rows || rows.length === 0) {
-    return (
-      <main className="container">
-        <h1>Коллекция недоступна</h1>
-        <p className="muted">Ссылка неверна, шаринг выключен — или коллекция пока пуста.</p>
-      </main>
-    );
+    return <Unavailable />;
   }
 
   const ownedRows = rows.filter((r: { status: string }) => r.status === "owned");
 
   if (ownedRows.length === 0) {
-    return (
-      <main className="container">
-        <h1>Коллекция недоступна</h1>
-        <p className="muted">Ссылка неверна, шаринг выключен — или коллекция пока пуста.</p>
-      </main>
-    );
+    return <Unavailable />;
   }
 
   const setNums = ownedRows.map((r: { set_num: string }) => r.set_num);
@@ -40,15 +39,14 @@ export default async function PublicCollection({ params }: { params: Promise<{ s
       set: bySetNum.get(r.set_num)!,
       status: r.status as Entry["status"],
     }));
-  const owned = entries.filter((e) => e.status === "owned");
   const themes = await getThemesCached().catch(() => []);
 
   return (
     <main className="container">
       <h1>Коллекция LEGO</h1>
       <p className="muted">Публичная витрина — только просмотр.</p>
-      <StatsPanel entries={owned} themes={themes} />
-      <CollectionList entries={owned} themes={themes} editable={false} />
+      <StatsPanel entries={entries} themes={themes} />
+      <CollectionList entries={entries} themes={themes} editable={false} />
     </main>
   );
 }
