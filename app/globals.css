@@ -104,3 +104,13 @@ main.container { padding-top: 24px; padding-bottom: 48px; }
 .set-card-body { padding: 10px 12px; }
 .set-card-name { font-weight: 600; }
 .set-noimg { aspect-ratio: 4/3; display: grid; place-items: center; font-size: 48px; }
+
+/* страница набора */
+.set-page { display: grid; grid-template-columns: 1fr 1fr; gap: 24px; }
+@media (max-width: 760px) { .set-page { grid-template-columns: 1fr; } }
+.set-hero img { width: 100%; object-fit: contain; background: #fff; }
+.set-facts div { display: flex; gap: 8px; }
+.set-facts dt { color: var(--muted); min-width: 130px; }
+.set-facts dd { margin: 0; font-weight: 600; }
+.set-actions { display: flex; gap: 10px; align-items: center; margin: 16px 0 24px; flex-wrap: wrap; }
+.ext-links { padding-left: 18px; }
