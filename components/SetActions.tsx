@@ -14,6 +14,17 @@ export default function SetActions({ setNum, initialStatus, isAuthed, withHint =
   const [status, setStatus] = useState<Status>(initialStatus);
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [popup, setPopup] = useState<Status>(null);
+
+  function scrollToBuy() {
+    setPopup(null);
+    document.getElementById("buy-section")?.scrollIntoView({ behavior: "smooth", block: "start" });
+    const avito = document.getElementById("buy-avito");
+    if (avito) {
+      avito.classList.add("blink");
+      setTimeout(() => avito.classList.remove("blink"), 1300);
+    }
+  }
 
   async function setTo(next: Status) {
     if (!isAuthed) { router.push("/login"); return; }
@@ -30,7 +41,7 @@ export default function SetActions({ setNum, initialStatus, isAuthed, withHint =
             { onConflict: "user_id,set_num" }
           );
       if (res.error) setError("Не получилось сохранить, попробуйте ещё раз.");
-      else setStatus(next);
+      else { setStatus(next); if (withHint && next) setPopup(next); }
     } catch {
       setError("Не получилось сохранить, попробуйте ещё раз.");
     } finally {
@@ -67,6 +78,29 @@ export default function SetActions({ setNum, initialStatus, isAuthed, withHint =
             Открыть {status === "owned" ? "коллекцию" : "вишлист"} →
           </Link>
         </p>
+      )}
+
+      {popup && (
+        <div className="popup-backdrop" onClick={() => setPopup(null)}>
+          <div className="popup" onClick={(e) => e.stopPropagation()} role="dialog" aria-modal="true">
+            <button className="popup-x" onClick={() => setPopup(null)} aria-label="Закрыть">×</button>
+            {popup === "owned" ? (
+              <>
+                <div className="popup-emoji">🎉</div>
+                <p className="popup-title">Набор в вашей коллекции!</p>
+                <p className="popup-text">Посмотреть все свои наборы и статистику?</p>
+                <Link className="btn btn-primary" href="/mine">Смотреть коллекцию →</Link>
+              </>
+            ) : (
+              <>
+                <div className="popup-emoji">⭐</div>
+                <p className="popup-title">Добавлено в вишлист!</p>
+                <p className="popup-text">Показать, где найти и купить этот набор?</p>
+                <button className="btn btn-primary" onClick={scrollToBuy}>Где купить →</button>
+              </>
+            )}
+          </div>
+        </div>
       )}
     </>
   );
