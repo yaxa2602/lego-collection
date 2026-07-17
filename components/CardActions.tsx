@@ -34,8 +34,17 @@ export default function CardActions({ setNum, initialStatus, isAuthed }:
   }
 
   return (
-    <div className="card-actions">
-      {status === "owned" ? (
+    <>
+      {status && (
+        <span
+          className={`card-mark ${status === "owned" ? "mark-owned" : "mark-wish"}`}
+          title={status === "owned" ? "В коллекции" : "В вишлисте"}
+        >
+          {status === "owned" ? "✓" : "★"}
+        </span>
+      )}
+      <div className="card-actions">
+        {status === "owned" ? (
         <button className="ca-btn ca-owned" disabled={busy} onClick={() => setTo(null)} title="Убрать из коллекции">✓ Есть</button>
       ) : status === "wishlist" ? (
         <>
@@ -47,7 +56,8 @@ export default function CardActions({ setNum, initialStatus, isAuthed }:
           <button className="ca-btn ca-primary" disabled={busy} onClick={() => setTo("owned")}>Есть</button>
           <button className="ca-btn" disabled={busy} onClick={() => setTo("wishlist")}>Хочу</button>
         </>
-      )}
-    </div>
+        )}
+      </div>
+    </>
   );
 }

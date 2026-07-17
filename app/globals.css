@@ -140,6 +140,17 @@ main.container { padding-top: 8px; padding-bottom: 56px; }
 .set-card-meta { margin-top: 6px; font-size: 13px; color: var(--muted); }
 .set-card-price { margin-top: 5px; font-weight: 700; font-size: 15px; }
 
+/* метка статуса в углу карточки — видна всегда */
+.card-mark {
+  position: absolute; top: 8px; right: 8px; z-index: 4;
+  width: 26px; height: 26px; border-radius: 50%;
+  display: inline-flex; align-items: center; justify-content: center;
+  font-size: 14px; font-weight: 700; color: #fff;
+  border: 2px solid #fff; box-shadow: 0 1px 3px rgb(0 0 0 / 0.25);
+}
+.mark-owned { background: var(--owned); }
+.mark-wish { background: var(--blue); }
+
 /* выезжающие кнопки на карточке */
 .card-actions {
   position: absolute; left: 0; right: 0; bottom: 0; z-index: 3;
