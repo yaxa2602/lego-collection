@@ -63,7 +63,9 @@ export default function ThemeFilter({ franchises, initialFranchise, initialSub }
         {open && (
           <ul
             className="combo-list"
-            onMouseDown={() => { if (blurTimer.current) clearTimeout(blurTimer.current); }}
+            // не даём полю потерять фокус при клике по варианту —
+            // иначе blur закрывает список раньше, чем сработает клик (первый клик «пустой»)
+            onMouseDown={(e) => e.preventDefault()}
           >
             {options.length === 1 ? (
               <li className="combo-empty">Ничего не найдено</li>
