@@ -219,16 +219,21 @@ main.container { padding-top: 8px; padding-bottom: 56px; }
 .set-facts > div:not(:last-child) { border-bottom: 1px solid var(--line); }
 .set-facts dt { margin: 0; color: var(--muted); }
 .set-facts dd { margin: 0; font-weight: 700; }
-.set-actions { display: flex; gap: 10px; align-items: center; margin: 0 0 24px; flex-wrap: wrap; }
-.section-title { font-weight: 700; font-size: 1.05rem; margin: 22px 0 10px; }
-.ext-links { list-style: none; padding: 0; margin: 0; display: flex; flex-wrap: wrap; gap: 8px; }
+.set-actions { display: flex; gap: 10px; align-items: center; margin: 0; flex-wrap: wrap; }
+.action-hint { margin: 10px 0 0; font-size: 14px; color: var(--muted); }
+.action-hint a { font-weight: 700; }
+.section-title { font-weight: 700; font-size: 1.05rem; margin: 26px 0 4px; }
+.section-note { margin: 0 0 12px; color: var(--muted); font-size: 14px; }
+.ext-links { list-style: none; padding: 0; margin: 0; display: grid; gap: 8px; }
 .ext-links a {
-  font-weight: 600; color: var(--ink);
-  padding: 9px 15px; border-radius: var(--radius-sm);
-  border: 1px solid var(--line); background: var(--panel);
-  display: inline-flex; align-items: center; gap: 7px;
+  display: flex; align-items: center; gap: 13px;
+  padding: 12px 14px; border-radius: var(--radius);
+  border: 1px solid var(--line); background: var(--panel); color: var(--ink);
 }
-.ext-links a:hover { border-color: #cfd3da; text-decoration: none; }
+.ext-links a:hover { border-color: #cfd3da; box-shadow: var(--shadow-sm); text-decoration: none; }
+.ext-ic { font-size: 22px; line-height: 1; }
+.ext-links b { display: block; font-weight: 700; }
+.ext-links small { color: var(--muted); font-size: 13px; }
 
 /* моя коллекция */
 .page-head { display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 10px; padding-top: 20px; }

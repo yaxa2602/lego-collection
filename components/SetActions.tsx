@@ -1,13 +1,14 @@
 "use client";
 
 import { useState } from "react";
+import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { createBrowserSupabase } from "@/lib/supabase/client";
 
 type Status = "owned" | "wishlist" | null;
 
-export default function SetActions({ setNum, initialStatus, isAuthed }:
-  { setNum: string; initialStatus: Status; isAuthed: boolean }) {
+export default function SetActions({ setNum, initialStatus, isAuthed, withHint = false }:
+  { setNum: string; initialStatus: Status; isAuthed: boolean; withHint?: boolean }) {
   const supabase = createBrowserSupabase();
   const router = useRouter();
   const [status, setStatus] = useState<Status>(initialStatus);
@@ -38,25 +39,35 @@ export default function SetActions({ setNum, initialStatus, isAuthed }:
   }
 
   return (
-    <div className="set-actions">
-      {status === "owned" ? (
-        <>
-          <span className="badge badge-owned">В коллекции</span>
-          <button className="btn" disabled={busy} onClick={() => setTo(null)}>Убрать</button>
-        </>
-      ) : status === "wishlist" ? (
-        <>
-          <span className="badge badge-wishlist">В вишлисте</span>
-          <button className="btn btn-primary" disabled={busy} onClick={() => setTo("owned")}>Теперь он у меня!</button>
-          <button className="btn" disabled={busy} onClick={() => setTo(null)}>Убрать</button>
-        </>
-      ) : (
-        <>
-          <button className="btn btn-primary" disabled={busy} onClick={() => setTo("owned")}>У меня есть</button>
-          <button className="btn" disabled={busy} onClick={() => setTo("wishlist")}>Хочу</button>
-        </>
-      )}
+    <>
+      <div className="set-actions">
+        {status === "owned" ? (
+          <>
+            <span className="badge badge-owned">В коллекции</span>
+            <button className="btn" disabled={busy} onClick={() => setTo(null)}>Убрать</button>
+          </>
+        ) : status === "wishlist" ? (
+          <>
+            <span className="badge badge-wishlist">В вишлисте</span>
+            <button className="btn btn-primary" disabled={busy} onClick={() => setTo("owned")}>Теперь он у меня!</button>
+            <button className="btn" disabled={busy} onClick={() => setTo(null)}>Убрать</button>
+          </>
+        ) : (
+          <>
+            <button className="btn btn-primary" disabled={busy} onClick={() => setTo("owned")}>У меня есть</button>
+            <button className="btn" disabled={busy} onClick={() => setTo("wishlist")}>Хочу</button>
+          </>
+        )}
+      </div>
       {error && <p className="error">{error}</p>}
-    </div>
+      {withHint && status && (
+        <p className="action-hint">
+          {status === "owned" ? "Набор в вашей коллекции. " : "Набор в вашем вишлисте. "}
+          <Link href={status === "owned" ? "/mine" : "/mine?tab=wishlist"}>
+            Открыть {status === "owned" ? "коллекцию" : "вишлист"} →
+          </Link>
+        </p>
+      )}
+    </>
   );
 }

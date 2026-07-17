@@ -45,12 +45,28 @@ export default async function SetPage({ params }: { params: Promise<{ setNum: st
           <div><dt>Деталей</dt><dd>{set.num_parts}</dd></div>
           <div><dt>Минифигурок</dt><dd>{set.num_minifigs}</dd></div>
         </dl>
-        <SetActions setNum={set.set_num} initialStatus={status} isAuthed={!!user} />
-        <h2 className="section-title">Купить и собрать</h2>
+        <SetActions setNum={set.set_num} initialStatus={status} isAuthed={!!user} withHint />
+        <h2 className="section-title">Где купить и как собрать</h2>
+        <p className="section-note">Набор мог сняться с продажи — вот где найти его и инструкцию:</p>
         <ul className="ext-links">
-          <li><a href={instructionsUrl(set.set_num)} target="_blank" rel="noopener">📖 Инструкция</a></li>
-          <li><a href={bricklinkUrl(set.set_num)} target="_blank" rel="noopener">🧱 BrickLink</a></li>
-          <li><a href={avitoUrl(set.set_num, set.name)} target="_blank" rel="noopener">🔎 Avito</a></li>
+          <li>
+            <a href={instructionsUrl(set.set_num)} target="_blank" rel="noopener">
+              <span className="ext-ic">📖</span>
+              <span><b>Инструкция по сборке</b><small>Официальный PDF на lego.com</small></span>
+            </a>
+          </li>
+          <li>
+            <a href={bricklinkUrl(set.set_num)} target="_blank" rel="noopener">
+              <span className="ext-ic">🧱</span>
+              <span><b>Купить на BrickLink</b><small>Мировой маркетплейс наборов и деталей, с ценами</small></span>
+            </a>
+          </li>
+          <li>
+            <a href={avitoUrl(set.set_num, set.name)} target="_blank" rel="noopener">
+              <span className="ext-ic">🔎</span>
+              <span><b>Найти на Avito</b><small>Объявления б/у в России</small></span>
+            </a>
+          </li>
         </ul>
       </div>
     </main>
