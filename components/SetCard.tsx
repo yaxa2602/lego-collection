@@ -16,7 +16,7 @@ export default function SetCard({ set, status, isAuthed }:
             ? <img src={set.img_url} alt={set.name} loading="lazy" />
             : <span className="set-noimg">🧱</span>}
         </Link>
-        <CardActions setNum={set.set_num} initialStatus={status} isAuthed={isAuthed} />
+        <CardActions setNum={set.set_num} setName={set.name} initialStatus={status} isAuthed={isAuthed} />
       </div>
       <Link className="set-card-body" href={href}>
         <span className="set-card-name">{set.name}</span>

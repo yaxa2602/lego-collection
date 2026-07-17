@@ -3,17 +3,19 @@
 import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { createBrowserSupabase } from "@/lib/supabase/client";
+import AddedDialog from "./AddedDialog";
 
 type Status = "owned" | "wishlist" | null;
 
 // Быстрые кнопки прямо на карточке каталога. На мыши выезжают при наведении,
 // на тач-экранах видны всегда (CSS). Логика та же, что на странице набора.
-export default function CardActions({ setNum, initialStatus, isAuthed }:
-  { setNum: string; initialStatus: Status; isAuthed: boolean }) {
+export default function CardActions({ setNum, setName, initialStatus, isAuthed }:
+  { setNum: string; setName: string; initialStatus: Status; isAuthed: boolean }) {
   const [supabase] = useState(() => createBrowserSupabase());
   const router = useRouter();
   const [status, setStatus] = useState<Status>(initialStatus);
   const [busy, setBusy] = useState(false);
+  const [popup, setPopup] = useState(false);
 
   async function setTo(next: Status) {
     if (!isAuthed) { router.push("/login"); return; }
@@ -27,7 +29,10 @@ export default function CardActions({ setNum, initialStatus, isAuthed }:
             { user_id: user.id, set_num: setNum, status: next },
             { onConflict: "user_id,set_num" }
           );
-      if (!res.error) setStatus(next);
+      if (!res.error) {
+        setStatus(next);
+        if (next === "wishlist") setPopup(true); // окно «где купить» при добавлении в вишлист
+      }
     } finally {
       setBusy(false);
     }
@@ -58,6 +63,9 @@ export default function CardActions({ setNum, initialStatus, isAuthed }:
         </>
         )}
       </div>
+      {popup && (
+        <AddedDialog kind="wishlist" setNum={setNum} setName={setName} onClose={() => setPopup(false)} />
+      )}
     </>
   );
 }

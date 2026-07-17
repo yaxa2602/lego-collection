@@ -243,7 +243,6 @@ main.container { padding-top: 8px; padding-bottom: 56px; }
 .stats-card h2, .stats-card h3 { font-size: 1rem; margin: 0 0 12px; }
 .stats-note { margin: -6px 0 20px; color: var(--muted); font-size: 13px; }
 .series { margin-top: 44px; }
-#buy-section { scroll-margin-top: 84px; }
 
 /* всплывающее окно после добавления */
 .popup-backdrop {
@@ -259,22 +258,26 @@ main.container { padding-top: 8px; padding-bottom: 56px; }
 .popup-emoji { font-size: 42px; line-height: 1; }
 .popup-title { font-weight: 700; font-size: 1.15rem; margin: 10px 0 4px; }
 .popup-text { color: var(--muted); margin: 0 0 18px; }
-.popup .btn { width: 100%; justify-content: center; }
+.popup-cta { width: 100%; justify-content: center; }
 .popup-x {
   position: absolute; top: 6px; right: 10px; border: none; background: none;
   font-size: 24px; line-height: 1; color: var(--muted); cursor: pointer;
 }
+/* варианты «где купить» внутри окна */
+.popup-links { display: grid; gap: 8px; text-align: left; }
+.buy-row {
+  display: flex; align-items: center; gap: 12px; padding: 11px 13px;
+  border: 1px solid var(--line); border-radius: var(--radius-sm);
+  background: var(--panel); color: var(--ink);
+}
+.buy-row:hover { border-color: #cfd3da; box-shadow: var(--shadow-sm); text-decoration: none; }
+.buy-row b { display: block; font-weight: 700; }
+.buy-row small { color: var(--muted); font-size: 13px; }
+.buy-row-hi { border-color: var(--accent); box-shadow: 0 0 0 1px var(--accent); }
 @keyframes pop-fade { from { opacity: 0; } to { opacity: 1; } }
 @keyframes pop-in { from { transform: translateY(10px) scale(.97); opacity: 0; } to { transform: none; opacity: 1; } }
-
-/* подмигивание кнопки Avito */
-.blink { animation: blink 0.42s ease-in-out 3; }
-@keyframes blink {
-  0%, 100% { box-shadow: 0 0 0 0 rgb(208 16 18 / 0); border-color: var(--line); }
-  50% { box-shadow: 0 0 0 4px rgb(208 16 18 / 0.35); border-color: var(--accent); }
-}
 @media (prefers-reduced-motion: reduce) {
-  .popup-backdrop, .popup, .blink { animation: none; }
+  .popup-backdrop, .popup { animation: none; }
 }
 .totals { display: flex; justify-content: space-around; text-align: center; }
 .totals b { display: block; font-size: 26px; font-family: var(--font-display), sans-serif; }

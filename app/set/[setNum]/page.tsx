@@ -61,8 +61,8 @@ export default async function SetPage({ params }: { params: Promise<{ setNum: st
           <div><dt>Деталей</dt><dd>{set.num_parts}</dd></div>
           <div><dt>Минифигурок</dt><dd>{set.num_minifigs}</dd></div>
         </dl>
-        <SetActions setNum={set.set_num} initialStatus={status} isAuthed={!!user} withHint />
-        <h2 id="buy-section" className="section-title">Где купить и как собрать</h2>
+        <SetActions setNum={set.set_num} setName={set.name} initialStatus={status} isAuthed={!!user} withHint />
+        <h2 className="section-title">Где купить и как собрать</h2>
         <p className="section-note">Набор мог сняться с продажи — вот где найти его и инструкцию:</p>
         <ul className="ext-links">
           <li>
@@ -78,7 +78,7 @@ export default async function SetPage({ params }: { params: Promise<{ setNum: st
             </a>
           </li>
           <li>
-            <a id="buy-avito" href={avitoUrl(set.set_num, set.name)} target="_blank" rel="noopener">
+            <a href={avitoUrl(set.set_num, set.name)} target="_blank" rel="noopener">
               <span className="ext-ic">🔎</span>
               <span><b>Найти на Avito</b><small>Объявления б/у в России</small></span>
             </a>

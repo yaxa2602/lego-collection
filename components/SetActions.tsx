@@ -4,27 +4,18 @@ import { useState } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { createBrowserSupabase } from "@/lib/supabase/client";
+import AddedDialog from "./AddedDialog";
 
 type Status = "owned" | "wishlist" | null;
 
-export default function SetActions({ setNum, initialStatus, isAuthed, withHint = false }:
-  { setNum: string; initialStatus: Status; isAuthed: boolean; withHint?: boolean }) {
+export default function SetActions({ setNum, setName = "", initialStatus, isAuthed, withHint = false }:
+  { setNum: string; setName?: string; initialStatus: Status; isAuthed: boolean; withHint?: boolean }) {
   const supabase = createBrowserSupabase();
   const router = useRouter();
   const [status, setStatus] = useState<Status>(initialStatus);
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [popup, setPopup] = useState<Status>(null);
-
-  function scrollToBuy() {
-    setPopup(null);
-    document.getElementById("buy-section")?.scrollIntoView({ behavior: "smooth", block: "start" });
-    const avito = document.getElementById("buy-avito");
-    if (avito) {
-      avito.classList.add("blink");
-      setTimeout(() => avito.classList.remove("blink"), 1300);
-    }
-  }
 
   async function setTo(next: Status) {
     if (!isAuthed) { router.push("/login"); return; }
@@ -81,26 +72,7 @@ export default function SetActions({ setNum, initialStatus, isAuthed, withHint =
       )}
 
       {popup && (
-        <div className="popup-backdrop" onClick={() => setPopup(null)}>
-          <div className="popup" onClick={(e) => e.stopPropagation()} role="dialog" aria-modal="true">
-            <button className="popup-x" onClick={() => setPopup(null)} aria-label="Закрыть">×</button>
-            {popup === "owned" ? (
-              <>
-                <div className="popup-emoji">🎉</div>
-                <p className="popup-title">Набор в вашей коллекции!</p>
-                <p className="popup-text">Посмотреть все свои наборы и статистику?</p>
-                <Link className="btn btn-primary" href="/mine">Смотреть коллекцию →</Link>
-              </>
-            ) : (
-              <>
-                <div className="popup-emoji">⭐</div>
-                <p className="popup-title">Добавлено в вишлист!</p>
-                <p className="popup-text">Показать, где найти и купить этот набор?</p>
-                <button className="btn btn-primary" onClick={scrollToBuy}>Где купить →</button>
-              </>
-            )}
-          </div>
-        </div>
+        <AddedDialog kind={popup} setNum={setNum} setName={setName} onClose={() => setPopup(null)} />
       )}
     </>
   );
