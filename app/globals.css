@@ -38,42 +38,28 @@ main.container { padding-top: 8px; padding-bottom: 56px; }
 .muted { color: var(--muted); }
 .error { color: var(--accent); font-weight: 600; }
 
-/* шапка — красный кубик LEGO */
+/* шапка — тёмная, с иллюстрированным кубиком и красным акцентом */
 .site-header {
   position: sticky; top: 0; z-index: 50;
-  background: linear-gradient(180deg, #e01517 0%, #c60f11 100%);
-  box-shadow: 0 3px 0 #9c0c0e, 0 7px 18px rgb(0 0 0 / 0.22);
+  background: linear-gradient(180deg, #212329 0%, #191a1e 100%);
+  border-bottom: 2px solid var(--accent);
+  box-shadow: 0 4px 20px rgb(0 0 0 / 0.20);
 }
-/* ряд шляпок сверху — «верх кубика» */
-.site-header::before {
-  content: ""; position: absolute; left: 0; right: 0; top: 0; height: 11px;
-  background-image:
-    radial-gradient(circle at 14px 6px, rgb(255 255 255 / 0.30) 0 4px, transparent 4.6px),
-    radial-gradient(circle at 14px 8px, rgb(0 0 0 / 0.22) 0 4.4px, transparent 5px);
-  background-size: 28px 11px; background-repeat: repeat-x; pointer-events: none;
-}
-.site-header .container { position: relative; display: flex; align-items: center; gap: 20px; height: 58px; padding-top: 9px; }
+.site-header .container { display: flex; align-items: center; gap: 20px; height: 62px; }
 .logo {
   font-family: var(--font-display), sans-serif; font-weight: 800; font-size: 19px;
   letter-spacing: -0.01em; color: #fff;
-  display: inline-flex; align-items: center; gap: 10px;
-  text-shadow: 0 1px 1px rgb(0 0 0 / 0.25);
+  display: inline-flex; align-items: center; gap: 11px;
 }
 .logo:hover { text-decoration: none; color: #fff; }
-.studs { display: inline-flex; gap: 5px; }
-.studs i {
-  width: 13px; height: 13px; border-radius: 50%; background: #fff;
-  box-shadow: inset 0 -2px 1px rgb(0 0 0 / 0.22), inset 0 2px 1px rgb(255 255 255 / 0.7);
-}
-.studs i:nth-child(2) { background: var(--yellow); }
-.studs i:nth-child(3) { background: #ffe6a0; }
-.nav { margin-left: auto; display: flex; gap: 8px; align-items: center; }
+.logo-brick { display: block; filter: drop-shadow(0 2px 3px rgb(0 0 0 / 0.35)); }
+.wordmark b { color: #ff4143; font-weight: 800; }
+.nav { margin-left: auto; display: flex; gap: 6px; align-items: center; }
 .nav a {
-  color: #fff; font-weight: 700; font-size: 15px;
-  padding: 7px 13px; border-radius: 9px;
-  text-shadow: 0 1px 1px rgb(0 0 0 / 0.2);
+  color: rgb(255 255 255 / 0.86); font-weight: 700; font-size: 15px;
+  padding: 8px 13px; border-radius: 9px;
 }
-.nav a:hover { text-decoration: none; background: rgb(255 255 255 / 0.16); }
+.nav a:hover { color: #fff; text-decoration: none; background: rgb(255 255 255 / 0.10); }
 
 /* герой каталога */
 .hero { padding: 30px 0 20px; }
