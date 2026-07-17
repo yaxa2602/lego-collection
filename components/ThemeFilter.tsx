@@ -56,7 +56,8 @@ export default function ThemeFilter({ franchises, initialFranchise, initialSub }
           role="combobox"
           aria-expanded={open}
           onChange={(e) => { setQuery(e.target.value); setOpen(true); setActive(0); }}
-          onFocus={() => { setOpen(true); setActive(0); }}
+          onFocus={(e) => { setOpen(true); setActive(0); e.currentTarget.select(); }}
+          onClick={() => setOpen(true)}
           onBlur={() => { blurTimer.current = setTimeout(() => { setOpen(false); setQuery(selectedName); }, 120); }}
           onKeyDown={onKeyDown}
         />
