@@ -2,14 +2,27 @@ import Link from "next/link";
 import SetCard from "@/components/SetCard";
 import { searchSets, getThemesCached } from "@/lib/rebrickable";
 import { buildThemeTree } from "@/lib/themes";
+import { createServerSupabase } from "@/lib/supabase/server";
 
 export const dynamic = "force-dynamic";
 
 type Search = { q?: string; franchise?: string; sub?: string; sort?: string; page?: string };
+type Status = "owned" | "wishlist" | null;
+
+// Номера страниц для пагинатора: 1 … вокруг текущей … последняя.
+function pageWindow(cur: number, total: number): (number | "…")[] {
+  if (total <= 7) return Array.from({ length: total }, (_, i) => i + 1);
+  const out: (number | "…")[] = [1];
+  if (cur > 4) out.push("…");
+  for (let p = Math.max(2, cur - 1); p <= Math.min(total - 1, cur + 1); p++) out.push(p);
+  if (cur < total - 3) out.push("…");
+  out.push(total);
+  return out;
+}
 
 export default async function Catalog({ searchParams }: { searchParams: Promise<Search> }) {
   const sp = await searchParams;
-  const page = Math.max(1, Number(sp.page) || 1);
+  const page = Math.max(1, Math.trunc(Number(sp.page)) || 1);
   const franchiseId = Number(sp.franchise) || undefined;
   const subId = Number(sp.sub) || undefined;
 
@@ -18,12 +31,20 @@ export default async function Catalog({ searchParams }: { searchParams: Promise<
   let failed = false;
   try {
     themes = await getThemesCached();
-    // Rebrickable's theme_id param accepts только ОДИН id — список через запятую даёт 400.
-    // Поэтому без descendantIds: sub, иначе franchise, иначе без фильтра по теме.
+    // Rebrickable's theme_id принимает только ОДИН id — список через запятую даёт 400.
     const themeIds = subId ? [subId] : franchiseId ? [franchiseId] : undefined;
     result = await searchSets({ search: sp.q, themeIds, ordering: sp.sort, page });
   } catch {
     failed = true;
+  }
+
+  // Статусы наборов текущего пользователя — одним запросом, для кнопок на карточках.
+  const supabase = await createServerSupabase();
+  const { data: { user } } = await supabase.auth.getUser();
+  const statusOf = new Map<string, Status>();
+  if (user && result) {
+    const { data } = await supabase.from("collection_items").select("set_num,status");
+    for (const r of data ?? []) statusOf.set(r.set_num as string, r.status as Status);
   }
 
   const tree = buildThemeTree(themes);
@@ -42,8 +63,13 @@ export default async function Catalog({ searchParams }: { searchParams: Promise<
 
   return (
     <main className="container">
+      <section className="hero">
+        <h1>Каталог <span className="accent">LEGO</span></h1>
+        <p>Найди наборы, отметь «есть» или «хочу» и собери свою статистику.</p>
+      </section>
+
       <form className="filters" method="get" action="/">
-        <input className="input" type="search" name="q" placeholder="Название или номер набора" defaultValue={sp.q ?? ""} />
+        <input className="input search" type="search" name="q" placeholder="Название или номер набора" defaultValue={sp.q ?? ""} />
         <select className="input" name="franchise" defaultValue={sp.franchise ?? ""}>
           <option value="">Все франшизы</option>
           {tree.map((t) => <option key={t.id} value={t.id}>{t.name}</option>)}
@@ -69,15 +95,29 @@ export default async function Catalog({ searchParams }: { searchParams: Promise<
       )}
       {result && result.count > 0 && (
         <>
-          <p className="muted">Найдено наборов: {result.count}</p>
+          <p className="result-count">Найдено наборов: {result.count}</p>
           <ul className="grid">
-            {result.sets.map((s) => <SetCard key={s.set_num} set={s} />)}
+            {result.sets.map((s) => (
+              <SetCard key={s.set_num} set={s} status={statusOf.get(s.set_num) ?? null} isAuthed={!!user} />
+            ))}
           </ul>
           {totalPages > 1 && (
-            <nav className="pager">
-              {page > 1 && <Link className="btn" href={qs(page - 1)}>← Назад</Link>}
-              <span className="muted">Стр. {page} из {totalPages}</span>
-              {page < totalPages && <Link className="btn" href={qs(page + 1)}>Вперёд →</Link>}
+            <nav className="pager" aria-label="Страницы">
+              {page > 1 && <Link className="pg" href={qs(page - 1)} aria-label="Предыдущая">←</Link>}
+              {pageWindow(page, totalPages).map((p, i) =>
+                p === "…"
+                  ? <span key={`g${i}`} className="pg-gap">…</span>
+                  : <Link key={p} className={p === page ? "pg pg-current" : "pg"} href={qs(p)}>{p}</Link>
+              )}
+              {page < totalPages && <Link className="pg" href={qs(page + 1)} aria-label="Следующая">→</Link>}
+              <form className="pager-jump" method="get" action="/">
+                {sp.q && <input type="hidden" name="q" value={sp.q} />}
+                {sp.franchise && <input type="hidden" name="franchise" value={sp.franchise} />}
+                {sp.sub && <input type="hidden" name="sub" value={sp.sub} />}
+                {sp.sort && <input type="hidden" name="sort" value={sp.sort} />}
+                <input className="input" type="number" name="page" min={1} max={totalPages} placeholder={`№`} aria-label="Перейти к странице" />
+                <button className="btn" type="submit">Перейти</button>
+              </form>
             </nav>
           )}
         </>

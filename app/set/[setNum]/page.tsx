@@ -37,8 +37,8 @@ export default async function SetPage({ params }: { params: Promise<{ setNum: st
         {set.img_url && <img src={set.img_url} alt={set.name} />}
       </div>
       <div>
-        <h1>{set.name}</h1>
-        <p className="muted">{themePath(set.theme_id, themes)}</p>
+        <h1 className="set-title">{set.name}</h1>
+        <p className="set-crumb">{themePath(set.theme_id, themes)}</p>
         <dl className="set-facts">
           <div><dt>Номер</dt><dd>{bareSetNum(set.set_num)}</dd></div>
           <div><dt>Год выпуска</dt><dd>{set.year}</dd></div>
@@ -46,11 +46,11 @@ export default async function SetPage({ params }: { params: Promise<{ setNum: st
           <div><dt>Минифигурок</dt><dd>{set.num_minifigs}</dd></div>
         </dl>
         <SetActions setNum={set.set_num} initialStatus={status} isAuthed={!!user} />
-        <h2>Ссылки</h2>
+        <h2 className="section-title">Купить и собрать</h2>
         <ul className="ext-links">
-          <li><a href={instructionsUrl(set.set_num)} target="_blank" rel="noopener">Инструкции по сборке (lego.com)</a></li>
-          <li><a href={bricklinkUrl(set.set_num)} target="_blank" rel="noopener">Цены и наличие на BrickLink</a></li>
-          <li><a href={avitoUrl(set.set_num, set.name)} target="_blank" rel="noopener">Поискать на Avito</a></li>
+          <li><a href={instructionsUrl(set.set_num)} target="_blank" rel="noopener">📖 Инструкция</a></li>
+          <li><a href={bricklinkUrl(set.set_num)} target="_blank" rel="noopener">🧱 BrickLink</a></li>
+          <li><a href={avitoUrl(set.set_num, set.name)} target="_blank" rel="noopener">🔎 Avito</a></li>
         </ul>
       </div>
     </main>

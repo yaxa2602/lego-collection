@@ -1,5 +1,5 @@
 import type { Metadata } from "next";
-import { Rubik } from "next/font/google";
+import { Rubik, Unbounded } from "next/font/google";
 import Link from "next/link";
 import "./globals.css";
 
@@ -7,6 +7,12 @@ const rubik = Rubik({
   subsets: ["latin", "cyrillic"],
   weight: ["400", "600", "700"],
   variable: "--font-rubik",
+});
+
+const unbounded = Unbounded({
+  subsets: ["latin", "cyrillic"],
+  weight: ["700", "800"],
+  variable: "--font-display",
 });
 
 export const metadata: Metadata = {
@@ -17,7 +23,7 @@ export const metadata: Metadata = {
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
-    <html lang="ru" className={rubik.variable}>
+    <html lang="ru" className={`${rubik.variable} ${unbounded.variable}`}>
       <body>
         <header className="site-header">
           <div className="container">
