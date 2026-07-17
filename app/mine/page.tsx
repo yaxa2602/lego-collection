@@ -47,7 +47,7 @@ export default async function Mine({ searchParams }: { searchParams: Promise<{ t
         </p>
       ) : (
         <>
-          {active === "owned" && <StatsPanel entries={shown} themes={themes} />}
+          <StatsPanel entries={shown} themes={themes} />
           <CollectionList entries={shown} themes={themes} editable />
         </>
       )}

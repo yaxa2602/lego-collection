@@ -1,9 +1,12 @@
 import { notFound } from "next/navigation";
 import SetActions from "@/components/SetActions";
-import { getSetCached, getThemesCached } from "@/lib/rebrickable";
+import SetCard from "@/components/SetCard";
+import { getSetCached, getThemesCached, searchSets, type CachedSet } from "@/lib/rebrickable";
 import { themePath } from "@/lib/themes";
 import { instructionsUrl, bricklinkUrl, avitoUrl, bareSetNum } from "@/lib/links";
 import { createServerSupabase } from "@/lib/supabase/server";
+
+type Status = "owned" | "wishlist" | null;
 
 export const dynamic = "force-dynamic";
 
@@ -24,15 +27,28 @@ export default async function SetPage({ params }: { params: Promise<{ setNum: st
   const themes = await getThemesCached().catch(() => []);
   const supabase = await createServerSupabase();
   const { data: { user } } = await supabase.auth.getUser();
-  let status: "owned" | "wishlist" | null = null;
+
+  // Статусы всех наборов пользователя — для текущего набора, меток и фильтра серии.
+  const statusOf = new Map<string, Status>();
   if (user) {
-    const { data } = await supabase.from("collection_items")
-      .select("status").eq("set_num", setNum).maybeSingle();
-    status = (data?.status as typeof status) ?? null;
+    const { data } = await supabase.from("collection_items").select("set_num,status");
+    for (const r of data ?? []) statusOf.set(r.set_num as string, r.status as Status);
   }
+  const status = statusOf.get(set.set_num) ?? null;
+
+  // «Соберите серию»: другие наборы этой же темы, которых у пользователя ещё нет.
+  const themeName = themes.find((t) => t.id === set.theme_id)?.name;
+  let series: CachedSet[] = [];
+  try {
+    const r = await searchSets({ themeIds: [set.theme_id], ordering: "-year" });
+    series = r.sets
+      .filter((s) => s.set_num !== set.set_num && statusOf.get(s.set_num) !== "owned")
+      .slice(0, 8);
+  } catch { /* API недоступен — секцию просто не показываем */ }
 
   return (
-    <main className="container set-page">
+    <main className="container">
+      <div className="set-page">
       <div className="card set-hero">
         {set.img_url && <img src={set.img_url} alt={set.name} />}
       </div>
@@ -69,6 +85,21 @@ export default async function SetPage({ params }: { params: Promise<{ setNum: st
           </li>
         </ul>
       </div>
+      </div>
+
+      {series.length > 0 && (
+        <section className="series">
+          <h2 className="section-title">Соберите серию</h2>
+          <p className="section-note">
+            Другие наборы{themeName ? ` серии «${themeName}»` : " этой темы"}, которых у вас ещё нет.
+          </p>
+          <ul className="grid">
+            {series.map((s) => (
+              <SetCard key={s.set_num} set={s} status={statusOf.get(s.set_num) ?? null} isAuthed={!!user} />
+            ))}
+          </ul>
+        </section>
+      )}
     </main>
   );
 }

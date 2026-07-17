@@ -240,7 +240,9 @@ main.container { padding-top: 8px; padding-bottom: 56px; }
 .tabs { display: flex; gap: 8px; margin: 14px 0 10px; }
 .stats { display: grid; gap: 16px; grid-template-columns: repeat(auto-fit, minmax(260px, 1fr)); margin: 20px 0; }
 .stats-card { background: var(--panel); border: 1px solid var(--line); border-radius: var(--radius); padding: 16px 18px; box-shadow: var(--shadow-sm); }
-.stats-card h2 { font-size: 1rem; margin: 0 0 12px; }
+.stats-card h2, .stats-card h3 { font-size: 1rem; margin: 0 0 12px; }
+.stats-note { margin: -6px 0 20px; color: var(--muted); font-size: 13px; }
+.series { margin-top: 44px; }
 .totals { display: flex; justify-content: space-around; text-align: center; }
 .totals b { display: block; font-size: 26px; font-family: var(--font-display), sans-serif; }
 .bar-row { display: grid; grid-template-columns: 1fr 2fr auto; gap: 8px; align-items: center; margin: 7px 0; font-size: 14px; }
