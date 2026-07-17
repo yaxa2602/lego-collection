@@ -1,5 +1,6 @@
 import Link from "next/link";
 import SetCard from "@/components/SetCard";
+import ThemeFilter from "@/components/ThemeFilter";
 import { searchSets, getThemesCached } from "@/lib/rebrickable";
 import { buildThemeTree } from "@/lib/themes";
 import { createServerSupabase } from "@/lib/supabase/server";
@@ -47,8 +48,13 @@ export default async function Catalog({ searchParams }: { searchParams: Promise<
     for (const r of data ?? []) statusOf.set(r.set_num as string, r.status as Status);
   }
 
-  const tree = buildThemeTree(themes);
-  const franchise = tree.find((t) => t.id === franchiseId);
+  // Франшизы для фильтра: корневые темы (дедуп по имени на всякий случай),
+  // с их прямыми подколлекциями. Порядок уже алфавитный из buildThemeTree.
+  const seen = new Set<string>();
+  const franchises = buildThemeTree(themes)
+    .filter((t) => !seen.has(t.name) && seen.add(t.name))
+    .map((t) => ({ id: t.id, name: t.name, subs: t.children.map((c) => ({ id: c.id, name: c.name })) }));
+
   const totalPages = result ? Math.ceil(result.count / 24) : 0;
   const qs = (p: number) => {
     const u = new URLSearchParams();
@@ -70,14 +76,7 @@ export default async function Catalog({ searchParams }: { searchParams: Promise<
 
       <form className="filters" method="get" action="/">
         <input className="input search" type="search" name="q" placeholder="Название или номер набора" defaultValue={sp.q ?? ""} />
-        <select className="input" name="franchise" defaultValue={sp.franchise ?? ""}>
-          <option value="">Все франшизы</option>
-          {tree.map((t) => <option key={t.id} value={t.id}>{t.name}</option>)}
-        </select>
-        <select className="input" name="sub" defaultValue={sp.sub ?? ""}>
-          <option value="">Все подколлекции</option>
-          {franchise?.children.map((c) => <option key={c.id} value={c.id}>{c.name}</option>)}
-        </select>
+        <ThemeFilter franchises={franchises} initialFranchise={sp.franchise} initialSub={sp.sub} />
         <select className="input" name="sort" defaultValue={sp.sort ?? "-year"}>
           <option value="-year">Сначала новые</option>
           <option value="year">Сначала старые</option>
