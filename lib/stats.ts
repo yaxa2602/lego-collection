@@ -15,12 +15,13 @@ export function totals(entries: Entry[]) {
   );
 }
 
-// Грубая оценка стоимости: средняя розничная цена LEGO ~ $0.11 за деталь.
-// Не настоящая цена — только прикидка по числу деталей.
-const USD_PER_PART = 0.11;
-export function estimateUsd(entries: Entry[]): number {
+// Грубая оценка стоимости в рублях: средняя розничная цена LEGO ~ $0.11 за деталь,
+// курс заложен константой (~95 ₽/$) — это прикидка по числу деталей, не настоящая цена.
+const RUB_PER_PART = 0.11 * 95;
+export function estimateRub(entries: Entry[]): number {
   const parts = entries.reduce((n, e) => n + e.set.num_parts, 0);
-  return Math.round(parts * USD_PER_PART);
+  // округляем до сотен рублей — точность тут всё равно иллюзорна
+  return Math.round((parts * RUB_PER_PART) / 100) * 100;
 }
 
 function tally(labels: string[]): Map<string, number> {

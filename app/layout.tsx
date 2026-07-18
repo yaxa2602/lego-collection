@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import { Rubik, Unbounded } from "next/font/google";
 import Link from "next/link";
+import Toast from "@/components/Toast";
 import "./globals.css";
 
 const rubik = Rubik({
@@ -60,7 +61,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
                   <ellipse cx="37.9" cy="7.9" rx="1.4" ry="0.7" />
                 </g>
               </svg>
-              <span className="wordmark">Коллекция&nbsp;<b>LEGO</b></span>
+              <span className="wordmark"><span className="wordmark-long">Коллекция&nbsp;</span><b>LEGO</b></span>
             </Link>
             <nav className="nav">
               <Link href="/">Каталог</Link>
@@ -69,6 +70,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
           </div>
         </header>
         {children}
+        <Toast />
       </body>
     </html>
   );

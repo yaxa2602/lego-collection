@@ -3,7 +3,6 @@
 import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { createBrowserSupabase } from "@/lib/supabase/client";
-import AddedDialog from "./AddedDialog";
 
 type Status = "owned" | "wishlist" | null;
 
@@ -15,7 +14,6 @@ export default function CardActions({ setNum, setName, initialStatus, isAuthed }
   const router = useRouter();
   const [status, setStatus] = useState<Status>(initialStatus);
   const [busy, setBusy] = useState(false);
-  const [popup, setPopup] = useState(false);
 
   async function setTo(next: Status) {
     if (!isAuthed) { router.push("/login"); return; }
@@ -31,7 +29,10 @@ export default function CardActions({ setNum, setName, initialStatus, isAuthed }
           );
       if (!res.error) {
         setStatus(next);
-        if (next === "wishlist") setPopup(true); // окно «где купить» при добавлении в вишлист
+        // ненавязчивое уведомление снизу — чтобы можно было отмечать наборы пачкой
+        if (next === "wishlist") {
+          window.dispatchEvent(new CustomEvent("lego-toast", { detail: { setNum, setName } }));
+        }
       }
     } finally {
       setBusy(false);
@@ -63,9 +64,6 @@ export default function CardActions({ setNum, setName, initialStatus, isAuthed }
         </>
         )}
       </div>
-      {popup && (
-        <AddedDialog kind="wishlist" setNum={setNum} setName={setName} onClose={() => setPopup(false)} />
-      )}
     </>
   );
 }
