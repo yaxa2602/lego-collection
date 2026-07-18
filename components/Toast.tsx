@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { instructionsUrl, bricklinkUrl, avitoUrl } from "@/lib/links";
+import { buyLinks } from "@/lib/links";
 
 type Detail = { setNum: string; setName: string };
 
@@ -29,9 +29,9 @@ export default function Toast() {
       <b className="toast-title">★ Добавлено в вишлист</b>
       <p className="toast-name">{item.setName}</p>
       <div className="toast-links">
-        <a href={avitoUrl(item.setNum, item.setName)} target="_blank" rel="noopener">🔎 Avito</a>
-        <a href={bricklinkUrl(item.setNum)} target="_blank" rel="noopener">🧱 BrickLink</a>
-        <a href={instructionsUrl(item.setNum)} target="_blank" rel="noopener">📖 Инструкция</a>
+        {buyLinks(item.setNum, item.setName).map((l) => (
+          <a key={l.id} href={l.url} target="_blank" rel="noopener">{l.icon} {l.title}</a>
+        ))}
       </div>
     </div>
   );

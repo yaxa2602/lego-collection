@@ -3,7 +3,7 @@ import SetActions from "@/components/SetActions";
 import SetCard from "@/components/SetCard";
 import { getSetCached, getThemesCached, searchSets, type CachedSet } from "@/lib/rebrickable";
 import { themePath } from "@/lib/themes";
-import { instructionsUrl, bricklinkUrl, avitoUrl, bareSetNum } from "@/lib/links";
+import { instructionsUrl, buyLinks, bareSetNum } from "@/lib/links";
 import { createServerSupabase } from "@/lib/supabase/server";
 
 type Status = "owned" | "wishlist" | null;
@@ -62,25 +62,24 @@ export default async function SetPage({ params }: { params: Promise<{ setNum: st
           <div><dt>Минифигурок</dt><dd>{set.num_minifigs}</dd></div>
         </dl>
         <SetActions setNum={set.set_num} setName={set.name} initialStatus={status} isAuthed={!!user} withHint />
-        <h2 className="section-title">Где купить и как собрать</h2>
-        <p className="section-note">Набор мог сняться с продажи — вот где найти его и инструкцию:</p>
+        <h2 className="section-title">Где купить</h2>
+        <p className="section-note">Цены смотрите на площадках — там они живые. Набор мог сняться с продажи:</p>
+        <ul className="ext-links">
+          {buyLinks(set.set_num, set.name).map((l) => (
+            <li key={l.id}>
+              <a href={l.url} target="_blank" rel="noopener">
+                <span className="ext-ic">{l.icon}</span>
+                <span><b>{l.title}</b><small>{l.note}</small></span>
+              </a>
+            </li>
+          ))}
+        </ul>
+        <h2 className="section-title">Как собрать</h2>
         <ul className="ext-links">
           <li>
             <a href={instructionsUrl(set.set_num)} target="_blank" rel="noopener">
               <span className="ext-ic">📖</span>
               <span><b>Инструкция по сборке</b><small>Официальный PDF на lego.com</small></span>
-            </a>
-          </li>
-          <li>
-            <a href={bricklinkUrl(set.set_num)} target="_blank" rel="noopener">
-              <span className="ext-ic">🧱</span>
-              <span><b>Купить на BrickLink</b><small>Мировой маркетплейс наборов и деталей, с ценами</small></span>
-            </a>
-          </li>
-          <li>
-            <a href={avitoUrl(set.set_num, set.name)} target="_blank" rel="noopener">
-              <span className="ext-ic">🔎</span>
-              <span><b>Найти на Avito</b><small>Объявления б/у в России</small></span>
             </a>
           </li>
         </ul>

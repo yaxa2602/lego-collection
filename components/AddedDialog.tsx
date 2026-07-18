@@ -2,7 +2,7 @@
 
 import Link from "next/link";
 import { createPortal } from "react-dom";
-import { instructionsUrl, bricklinkUrl, avitoUrl } from "@/lib/links";
+import { buyLinks } from "@/lib/links";
 
 // Окно после добавления набора: для вишлиста — сразу варианты «где купить»,
 // для коллекции — переход к своим наборам.
@@ -28,18 +28,12 @@ export default function AddedDialog({ kind, setNum, setName, onClose }:
             <p className="popup-title">Добавлено в вишлист!</p>
             <p className="popup-text">Где найти и купить этот набор:</p>
             <div className="popup-links">
-              <a className="buy-row buy-row-hi" href={avitoUrl(setNum, setName)} target="_blank" rel="noopener">
-                <span className="ext-ic">🔎</span>
-                <span><b>Найти на Avito</b><small>Объявления б/у в России</small></span>
-              </a>
-              <a className="buy-row" href={bricklinkUrl(setNum)} target="_blank" rel="noopener">
-                <span className="ext-ic">🧱</span>
-                <span><b>Купить на BrickLink</b><small>Мировой маркетплейс наборов и деталей</small></span>
-              </a>
-              <a className="buy-row" href={instructionsUrl(setNum)} target="_blank" rel="noopener">
-                <span className="ext-ic">📖</span>
-                <span><b>Инструкция по сборке</b><small>Официальный PDF на lego.com</small></span>
-              </a>
+              {buyLinks(setNum, setName).map((l, i) => (
+                <a key={l.id} className={i === 0 ? "buy-row buy-row-hi" : "buy-row"} href={l.url} target="_blank" rel="noopener">
+                  <span className="ext-ic">{l.icon}</span>
+                  <span><b>{l.title}</b><small>{l.note}</small></span>
+                </a>
+              ))}
             </div>
           </>
         )}

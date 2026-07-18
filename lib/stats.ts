@@ -15,15 +15,6 @@ export function totals(entries: Entry[]) {
   );
 }
 
-// Грубая оценка стоимости в рублях: средняя розничная цена LEGO ~ $0.11 за деталь,
-// курс заложен константой (~95 ₽/$) — это прикидка по числу деталей, не настоящая цена.
-const RUB_PER_PART = 0.11 * 95;
-export function estimateRub(entries: Entry[]): number {
-  const parts = entries.reduce((n, e) => n + e.set.num_parts, 0);
-  // округляем до сотен рублей — точность тут всё равно иллюзорна
-  return Math.round((parts * RUB_PER_PART) / 100) * 100;
-}
-
 function tally(labels: string[]): Map<string, number> {
   const m = new Map<string, number>();
   for (const l of labels) m.set(l, (m.get(l) ?? 0) + 1);

@@ -1,5 +1,5 @@
 import { describe, it, expect } from "vitest";
-import { totals, groupByFranchise, groupByYear, estimateRub, type Entry } from "./stats";
+import { totals, groupByFranchise, groupByYear, type Entry } from "./stats";
 import type { CachedSet, RbTheme } from "./rebrickable";
 
 const T: RbTheme[] = [
@@ -32,9 +32,5 @@ describe("stats", () => {
       { label: "2020", count: 1 },
       { label: "2021", count: 2 },
     ]);
-  });
-  it("estimateRub оценивает по деталям и округляет до сотен", () => {
-    expect(estimateRub(E)).toBe(6300); // 600 деталей * 10.45 ₽ = 6270 → 6300
-    expect(estimateRub([])).toBe(0);
   });
 });
