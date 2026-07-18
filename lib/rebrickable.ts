@@ -19,11 +19,13 @@ export type CachedSet = {
 type RbPage<T> = { count: number; next: string | null; results: T[] };
 
 export function buildSetsQuery(opts: {
-  search?: string; themeIds?: number[]; ordering?: string; page?: number;
+  search?: string; themeIds?: number[]; ordering?: string; page?: number; minYear?: number;
 }): URLSearchParams {
   const p = new URLSearchParams();
   if (opts.search?.trim()) p.set("search", opts.search.trim());
   if (opts.themeIds?.length) p.set("theme_id", opts.themeIds.join(","));
+  // фильтр по году делает сам Rebrickable — иначе счётчик и пагинация врали бы
+  if (opts.minYear) p.set("min_year", String(opts.minYear));
   p.set("ordering", ORDERINGS.has(opts.ordering ?? "") ? opts.ordering! : "-year");
   if (opts.page && opts.page > 1) p.set("page", String(opts.page));
   p.set("page_size", "24");

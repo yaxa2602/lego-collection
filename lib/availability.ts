@@ -12,3 +12,8 @@ export function retailStatus(year: number, now: Date = new Date()): RetailStatus
 export function isRetired(year: number, now?: Date): boolean {
   return retailStatus(year, now) === "retired";
 }
+
+// Самый ранний год, который ещё считаем «в продаже» — для фильтра каталога.
+export function retailMinYear(now: Date = new Date()): number {
+  return now.getFullYear() - RETIRE_AFTER_YEARS + 1;
+}

@@ -4,10 +4,11 @@ import ThemeFilter from "@/components/ThemeFilter";
 import { searchSets, getThemesCached } from "@/lib/rebrickable";
 import { buildThemeTree } from "@/lib/themes";
 import { createServerSupabase } from "@/lib/supabase/server";
+import { retailMinYear } from "@/lib/availability";
 
 export const dynamic = "force-dynamic";
 
-type Search = { q?: string; franchise?: string; sub?: string; sort?: string; page?: string };
+type Search = { q?: string; franchise?: string; sub?: string; sort?: string; page?: string; retail?: string };
 type Status = "owned" | "wishlist" | null;
 
 // Номера страниц для пагинатора: 1 … вокруг текущей … последняя.
@@ -26,6 +27,7 @@ export default async function Catalog({ searchParams }: { searchParams: Promise<
   const page = Math.max(1, Math.trunc(Number(sp.page)) || 1);
   const franchiseId = Number(sp.franchise) || undefined;
   const subId = Number(sp.sub) || undefined;
+  const onlyRetail = sp.retail === "1";
 
   let themes: Awaited<ReturnType<typeof getThemesCached>> = [];
   let result: { count: number; sets: Awaited<ReturnType<typeof searchSets>>["sets"] } | null = null;
@@ -34,7 +36,10 @@ export default async function Catalog({ searchParams }: { searchParams: Promise<
     themes = await getThemesCached();
     // Rebrickable's theme_id принимает только ОДИН id — список через запятую даёт 400.
     const themeIds = subId ? [subId] : franchiseId ? [franchiseId] : undefined;
-    result = await searchSets({ search: sp.q, themeIds, ordering: sp.sort, page });
+    result = await searchSets({
+      search: sp.q, themeIds, ordering: sp.sort, page,
+      minYear: onlyRetail ? retailMinYear() : undefined,
+    });
   } catch {
     failed = true;
   }
@@ -62,6 +67,7 @@ export default async function Catalog({ searchParams }: { searchParams: Promise<
     if (sp.franchise) u.set("franchise", sp.franchise);
     if (sp.sub) u.set("sub", sp.sub);
     if (sp.sort) u.set("sort", sp.sort);
+    if (onlyRetail) u.set("retail", "1");
     if (p > 1) u.set("page", String(p));
     const s = u.toString();
     return s ? `/?${s}` : "/";
@@ -83,6 +89,10 @@ export default async function Catalog({ searchParams }: { searchParams: Promise<
           <option value="name">По названию</option>
           <option value="-num_parts">По числу деталей</option>
         </select>
+        <label className="check" title={`Наборы ${retailMinYear()} года и новее — они, скорее всего, ещё продаются`}>
+          <input type="checkbox" name="retail" value="1" defaultChecked={onlyRetail} />
+          Только в продаже
+        </label>
         <button className="btn btn-primary" type="submit">Найти</button>
       </form>
 
@@ -114,6 +124,7 @@ export default async function Catalog({ searchParams }: { searchParams: Promise<
                 {sp.franchise && <input type="hidden" name="franchise" value={sp.franchise} />}
                 {sp.sub && <input type="hidden" name="sub" value={sp.sub} />}
                 {sp.sort && <input type="hidden" name="sort" value={sp.sort} />}
+                {onlyRetail && <input type="hidden" name="retail" value="1" />}
                 <input className="input" type="number" name="page" min={1} max={totalPages} placeholder={`№`} aria-label="Перейти к странице" />
                 <button className="btn" type="submit">Перейти</button>
               </form>
