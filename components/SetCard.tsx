@@ -1,6 +1,7 @@
 import Link from "next/link";
 import type { CachedSet } from "@/lib/rebrickable";
 import { bareSetNum } from "@/lib/links";
+import { isRetired } from "@/lib/availability";
 import CardActions from "./CardActions";
 
 type Status = "owned" | "wishlist" | null;
@@ -20,7 +21,10 @@ export default function SetCard({ set, status, isAuthed }:
       </div>
       <Link className="set-card-body" href={href}>
         <span className="set-card-name">{set.name}</span>
-        <span className="set-card-meta">{bareSetNum(set.set_num)} · {set.year} · {set.num_parts} дет.</span>
+        <span className="set-card-meta">
+          {bareSetNum(set.set_num)} · {set.year} · {set.num_parts} дет.
+          {isRetired(set.year) && <span className="tag-retired"> · снят с производства</span>}
+        </span>
       </Link>
     </li>
   );

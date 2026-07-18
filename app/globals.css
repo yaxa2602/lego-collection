@@ -109,6 +109,9 @@ main.container { padding-top: 8px; padding-bottom: 56px; }
 }
 .badge-owned { background: var(--owned); }
 .badge-wishlist { background: var(--blue); }
+.badge-retail { background: var(--owned); }
+.badge-retired { background: #8a6d3b; }
+.tag-retired { color: #8a6d3b; font-weight: 600; }
 
 /* фильтры-панель */
 .filters {

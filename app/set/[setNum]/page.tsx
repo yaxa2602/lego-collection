@@ -4,6 +4,7 @@ import SetCard from "@/components/SetCard";
 import { getSetCached, getThemesCached, searchSets, type CachedSet } from "@/lib/rebrickable";
 import { themePath } from "@/lib/themes";
 import { instructionsUrl, buyLinks, bareSetNum } from "@/lib/links";
+import { isRetired } from "@/lib/availability";
 import { createServerSupabase } from "@/lib/supabase/server";
 
 type Status = "owned" | "wishlist" | null;
@@ -25,6 +26,7 @@ export default async function SetPage({ params }: { params: Promise<{ setNum: st
   if (!set) notFound();
 
   const themes = await getThemesCached().catch(() => []);
+  const retired = isRetired(set.year);
   const supabase = await createServerSupabase();
   const { data: { user } } = await supabase.auth.getUser();
 
@@ -54,7 +56,15 @@ export default async function SetPage({ params }: { params: Promise<{ setNum: st
       </div>
       <div>
         <h1 className="set-title">{set.name}</h1>
-        <p className="set-crumb">{themePath(set.theme_id, themes)}</p>
+        <p className="set-crumb">
+          {themePath(set.theme_id, themes)}{" "}
+          <span
+            className={retired ? "badge badge-retired" : "badge badge-retail"}
+            title="Оценка по году выпуска: LEGO обычно держит набор в продаже 2–3 года"
+          >
+            {retired ? "Снят с производства" : "В продаже"}
+          </span>
+        </p>
         <dl className="set-facts">
           <div><dt>Номер</dt><dd>{bareSetNum(set.set_num)}</dd></div>
           <div><dt>Год выпуска</dt><dd>{set.year}</dd></div>
@@ -63,7 +73,11 @@ export default async function SetPage({ params }: { params: Promise<{ setNum: st
         </dl>
         <SetActions setNum={set.set_num} setName={set.name} initialStatus={status} isAuthed={!!user} withHint />
         <h2 className="section-title">Где купить</h2>
-        <p className="section-note">Цены смотрите на площадках — там они живые. Набор мог сняться с продажи:</p>
+        <p className="section-note">
+          {retired
+            ? "Набор, скорее всего, снят с производства — ищите на вторичном рынке. Цены там живые:"
+            : "Цены смотрите на площадках — там они живые:"}
+        </p>
         <ul className="ext-links">
           {buyLinks(set.set_num, set.name).map((l) => (
             <li key={l.id}>
